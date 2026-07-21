@@ -3,36 +3,19 @@ package govalidator
 import (
 	"reflect"
 	"regexp"
-	"sort"
 	"sync"
 )
 
-// Validator is a wrapper for a validator function that returns bool and accepts string.
 type Validator func(str string) bool
 
-// CustomTypeValidator is a wrapper for validator functions that returns bool and accepts any type.
-// The second parameter should be the context (in the case of validating a struct: the whole object being validated).
 type CustomTypeValidator func(i interface{}, o interface{}) bool
 
-// ParamValidator is a wrapper for validator functions that accept additional parameters.
 type ParamValidator func(str string, params ...string) bool
 
-// InterfaceParamValidator is a wrapper for functions that accept variants parameters for an interface value
 type InterfaceParamValidator func(in interface{}, params ...string) bool
 type tagOptionsMap map[string]tagOption
 
-func (t tagOptionsMap) orderedKeys() []string {
-	var keys []string
-	for k := range t {
-		keys = append(keys, k)
-	}
-
-	sort.Slice(keys, func(a, b int) bool {
-		return t[keys[a]].order < t[keys[b]].order
-	})
-
-	return keys
-}
+func (t tagOptionsMap) orderedKeys() []string { _ = "STUB: not implemented"; return nil }
 
 type tagOption struct {
 	name               string
@@ -40,26 +23,20 @@ type tagOption struct {
 	order              int
 }
 
-// UnsupportedTypeError is a wrapper for reflect.Type
 type UnsupportedTypeError struct {
 	Type reflect.Type
 }
 
-// stringValues is a slice of reflect.Value holding *reflect.StringValue.
-// It implements the methods to sort by string.
 type stringValues []reflect.Value
 
-// InterfaceParamTagMap is a map of functions accept variants parameters for an interface value
 var InterfaceParamTagMap = map[string]InterfaceParamValidator{
 	"type": IsType,
 }
 
-// InterfaceParamTagRegexMap maps interface param tags to their respective regexes.
 var InterfaceParamTagRegexMap = map[string]*regexp.Regexp{
 	"type": regexp.MustCompile(`^type\((.*)\)$`),
 }
 
-// ParamTagMap is a map of functions accept variants parameters
 var ParamTagMap = map[string]ParamValidator{
 	"length":          ByteLength,
 	"range":           Range,
@@ -72,7 +49,6 @@ var ParamTagMap = map[string]ParamValidator{
 	"maxstringlength": MaxStringLength,
 }
 
-// ParamTagRegexMap maps param tags to their respective regexes.
 var ParamTagRegexMap = map[string]*regexp.Regexp{
 	"range":           regexp.MustCompile("^range\\((\\d+)\\|(\\d+)\\)$"),
 	"length":          regexp.MustCompile("^length\\((\\d+)\\|(\\d+)\\)$"),
@@ -92,24 +68,17 @@ type customTypeTagMap struct {
 }
 
 func (tm *customTypeTagMap) Get(name string) (CustomTypeValidator, bool) {
-	tm.RLock()
-	defer tm.RUnlock()
-	v, ok := tm.validators[name]
-	return v, ok
+	_ = "STUB: not implemented"
+	return *new(CustomTypeValidator), false
 }
 
 func (tm *customTypeTagMap) Set(name string, ctv CustomTypeValidator) {
-	tm.Lock()
-	defer tm.Unlock()
-	tm.validators[name] = ctv
+	_ = "STUB: not implemented"
+	return
 }
 
-// CustomTypeTagMap is a map of functions that can be used as tags for ValidateStruct function.
-// Use this to validate compound or custom types that need to be handled as a whole, e.g.
-// `type UUID [16]byte` (this would be handled as an array of bytes).
 var CustomTypeTagMap = &customTypeTagMap{validators: make(map[string]CustomTypeValidator)}
 
-// TagMap is a map of functions, that can be used as tags for ValidateStruct function.
 var TagMap = map[string]Validator{
 	"email":              IsEmail,
 	"url":                IsURL,
@@ -170,7 +139,6 @@ var TagMap = map[string]Validator{
 	"jwt":                IsJWT,
 }
 
-// ISO3166Entry stores country codes
 type ISO3166Entry struct {
 	EnglishShortName string
 	FrenchShortName  string
@@ -179,7 +147,6 @@ type ISO3166Entry struct {
 	Numeric          string
 }
 
-// ISO3166List based on https://www.iso.org/obp/ui/#search/code/ Code Type "Officially Assigned Codes"
 var ISO3166List = []ISO3166Entry{
 	{"Afghanistan", "Afghanistan (l')", "AF", "AFG", "004"},
 	{"Albania", "Albanie (l')", "AL", "ALB", "008"},
@@ -432,7 +399,6 @@ var ISO3166List = []ISO3166Entry{
 	{"Zambia", "Zambie (la)", "ZM", "ZMB", "894"},
 }
 
-// ISO4217List is the list of ISO currency codes
 var ISO4217List = []string{
 	"AED", "AFN", "ALL", "AMD", "ANG", "AOA", "ARS", "AUD", "AWG", "AZN",
 	"BAM", "BBD", "BDT", "BGN", "BHD", "BIF", "BMD", "BND", "BOB", "BOV", "BRL", "BSD", "BTN", "BWP", "BYN", "BZD",
@@ -462,14 +428,12 @@ var ISO4217List = []string{
 	"ZAR", "ZMW", "ZWL",
 }
 
-// ISO693Entry stores ISO language codes
 type ISO693Entry struct {
 	Alpha3bCode string
 	Alpha2Code  string
 	English     string
 }
 
-// ISO693List based on http://data.okfn.org/data/core/language-codes/r/language-codes-3b2.json
 var ISO693List = []ISO693Entry{
 	{Alpha3bCode: "aar", Alpha2Code: "aa", English: "Afar"},
 	{Alpha3bCode: "abk", Alpha2Code: "ab", English: "Abkhazian"},
